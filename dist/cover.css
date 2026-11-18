@@ -59,3 +59,16 @@ html:has(.book-intro[open]) .hero-portrait { animation-play-state: paused; }
   .hero-note { margin-bottom: 17px; }
   .hero-stamp { display: none; }
 }
+.hero-scroll.motion-ready::after { content: ""; display: block; height: 85svh; }
+.hero-scroll.motion-ready .hero { position: sticky; top: 0; }
+.hero-portrait video { object-fit: contain; object-position: center; }
+.hero-portrait {
+  -webkit-mask-image: radial-gradient(ellipse 86% 61% at 50% 50%, #000 68%, transparent 100%);
+  mask-image: radial-gradient(ellipse 86% 61% at 50% 50%, #000 68%, transparent 100%);
+}
+.still .hero-scroll.motion-ready::after { display: none; }
+.still .hero-scroll.motion-ready .hero { position: relative; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll.motion-ready::after { display: none; }
+  .hero-scroll.motion-ready .hero { position: relative; }
+}
