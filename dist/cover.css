@@ -25,3 +25,37 @@ html:has(.book-intro[open]) .intro, html:has(.book-intro[open]) .name-letter { a
 .couple-portrait img { display: block; width: 100%; height: auto; }
 .couple-portrait figcaption { font: italic 27px 'Cormorant Garamond', serif; margin-top: 9px; }
 @media (prefers-reduced-motion: reduce) { .book-intro, .book-intro::backdrop { transition: none; } }
+.hero { isolation: isolate; grid-template-columns: 1fr 1fr; padding: 0 8%; background: #f8ded8; }
+.hero .garden { opacity: .82; animation: none; }
+.hero-portrait {
+  position: absolute;
+  inset: 0 3% 0 auto;
+  width: 53%;
+  margin: 0;
+  -webkit-mask-image: radial-gradient(ellipse 62% 64% at 50% 51%, #000 52%, transparent 94%);
+  mask-image: radial-gradient(ellipse 62% 64% at 50% 51%, #000 52%, transparent 94%);
+  animation: rise 1.5s both;
+}
+.hero-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center 33%; display: block; }
+.hero-copy { grid-column: 1; margin: 0; width: 100%; padding: 25px 0; }
+.hero h1 { font-size: clamp(60px, 8vw, 120px); line-height: .92; margin: 20px 0 26px; }
+.hero h1 .name-word { display: block; }
+.hero h1 > .hero-amp { display: block; font-size: .53em; line-height: 1.2; }
+.hero-stamp { right: 7%; bottom: 11%; }
+html:has(.book-intro[open]) .hero-portrait { animation-play-state: paused; }
+@media (max-width: 767px) {
+  .hero { display: flex; justify-content: center; align-items: flex-end; height: auto; min-height: max(660px, calc(100svh - 70px)); padding: 0 16px 52px; }
+  .hero .garden { background-size: auto 100%; opacity: .68; }
+  .hero-portrait {
+    inset: 0 0 auto; width: 100%; height: 65%;
+    -webkit-mask-image: radial-gradient(ellipse 65% 65% at 50% 46%, #000 48%, transparent 96%);
+    mask-image: radial-gradient(ellipse 65% 65% at 50% 46%, #000 48%, transparent 96%);
+  }
+  .hero-portrait img { object-position: center 24%; }
+  .hero-copy { padding: 0; }
+  .hero h1 { font-size: clamp(44px, 12vw, 75px); margin: 12px 0; max-width: none; }
+  .hero h1 .name-word { display: inline-block; }
+  .hero h1 > .hero-amp { display: inline-block; font-size: .65em; }
+  .hero-note { margin-bottom: 17px; }
+  .hero-stamp { display: none; }
+}
