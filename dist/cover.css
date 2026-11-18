@@ -87,8 +87,23 @@ html:has(.book-intro[open]) .hero-portrait { animation-play-state: paused; }
   max-height: 100cqh;
   border: 0;
   border-radius: 0;
-  mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent), linear-gradient(to bottom, transparent, #000 12%, #000 76%, transparent);
-  mask-composite: intersect;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent), linear-gradient(to bottom, transparent, #000 12%, #000 76%, transparent);
+  --portrait-feather-x: linear-gradient(90deg, transparent, #0003 6%, #000b 16%, #000 29%, #000 71%, #000b 84%, #0003 94%, transparent);
+  --portrait-feather-y: linear-gradient(180deg, transparent, #0005 7%, #000 19%, #000 64%, #000a 78%, #0003 91%, transparent);
+  -webkit-mask-image: var(--portrait-feather-x), var(--portrait-feather-y);
   -webkit-mask-composite: source-in;
+  mask-image: var(--portrait-feather-x), var(--portrait-feather-y);
+  mask-composite: intersect;
+}
+
+/* Bring the paper tone behind the portrait into the surrounding artwork. */
+.hero .garden::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 70% 46%, #f8d8cc 2%, #f8ded4a8 25%, transparent 58%);
+}
+@media (max-width: 767px) {
+  .hero .garden::after {
+    background: radial-gradient(ellipse at 50% 33%, #f8d8cc 4%, #f8ded49e 29%, transparent 66%);
+  }
 }
