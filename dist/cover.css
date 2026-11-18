@@ -1,0 +1,27 @@
+.book-intro {
+  border: 0; padding: 0; margin: 0; width: 100%; height: 100%;
+  max-width: none; max-height: none; background: transparent; color: var(--ink);
+  perspective: 1800px; overflow: hidden;
+}
+.book-intro::backdrop { background: #fbebed; transition: opacity 900ms ease; }
+.book-intro.turning::backdrop { opacity: 0; }
+.book-leaf {
+  position: absolute; inset: 0; display: grid; align-content: center; justify-items: center;
+  gap: 12px; padding: 20px 20px 90px; background: #f4dce1;
+  border-left: 9px solid #93566b; transform-origin: left center;
+  transition: transform 1050ms cubic-bezier(.55,.05,.25,1), opacity 950ms ease;
+}
+.book-leaf img { width: auto; height: min(49svh, 420px); max-width: 80vw; object-fit: contain; border-radius: 140px 140px 4px 4px; border: 5px solid #fff3ed; }
+.book-caption { text-align: center; }
+.book-caption p { font-size: 9px; letter-spacing: .23em; margin: 0; }
+.book-caption strong { display: block; font: 500 clamp(33px, 6vw, 56px)/1.1 'Cormorant Garamond', serif; margin: 5px 0; }
+.book-caption time { font-size: 11px; letter-spacing: .15em; }
+.cover-skip { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; translate: -50% 0; }
+.turning .book-leaf { transform: rotateY(-96deg) translateX(-10%); opacity: 0; }
+.turning .cover-skip { opacity: 0; }
+html:has(.book-intro[open]) { overflow: hidden; }
+html:has(.book-intro[open]) .intro, html:has(.book-intro[open]) .name-letter { animation-play-state: paused; }
+.couple-portrait { width: min(100%, 320px); margin: 42px auto 0; padding: 10px 10px 14px; background: #fff7f2; border: 1px solid var(--line); box-shadow: 5px 8px 0 #edd4dc; rotate: -2deg; }
+.couple-portrait img { display: block; width: 100%; height: auto; }
+.couple-portrait figcaption { font: italic 27px 'Cormorant Garamond', serif; margin-top: 9px; }
+@media (prefers-reduced-motion: reduce) { .book-intro, .book-intro::backdrop { transition: none; } }
