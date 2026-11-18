@@ -1,51 +1,74 @@
 (() => {
-  const video = document.getElementById('couple-motion');
-  const hero = video.closest('.hero');
+  const portrait = document.getElementById('couple-motion');
+  const hero = portrait.closest('.hero');
   const track = hero.parentElement;
   const cover = document.querySelector('.book-intro');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  let frame = 0;
-  let fallbackStarted = false;
+  const last = Number(portrait.dataset.frames) - 1;
+  const loaded = new Map([[0, portrait.getAttribute('src')]]);
+  const requested = new Set();
+  let active = 0;
+  let tick = 0;
+  let shown = 0;
+  let target = 0;
+
+  function load(index) {
+    if (loaded.has(index) || requested.has(index)) return;
+    const frame = new Image();
+    requested.add(index);
+    active++;
+    frame.src = 'portrait-frames/' + String(index).padStart(3, '0') + '.webp';
+    frame.decode().then(() => {
+      loaded.set(index, frame.src);
+      queueFrame();
+    }).catch(() => {}).finally(() => {
+      active--;
+      fillQueue();
+    });
+  }
+
+  function fillQueue() {
+    const order = [target, last];
+    for (let offset = 1; offset <= last; offset++) {
+      if (target + offset <= last) order.push(target + offset);
+      if (target - offset >= 0) order.push(target - offset);
+    }
+    for (const index of order) {
+      if (active >= 4) break;
+      load(index);
+    }
+  }
 
   function syncFrame() {
-    frame = 0;
+    tick = 0;
     if (cover.open || reducedMotion.matches || document.documentElement.classList.contains('still')) return;
-    if (!Number.isFinite(video.duration) || video.duration <= 0) return;
-    if (!video.seekable.length || video.seekable.end(video.seekable.length - 1) < 0.1) {
-      if (!fallbackStarted && video.readyState >= 4) {
-        fallbackStarted = true;
-        fetch(video.currentSrc)
-          .then(response => {
-            if (!response.ok) throw new Error('Video download failed');
-            return response.blob();
-          })
-          .then(blob => { video.src = URL.createObjectURL(blob); })
-          .catch(() => { /* Keep the first frame available. */ });
-      }
-      return;
-    }
-    const bounds = track.getBoundingClientRect();
     const distance = Math.max(1, track.offsetHeight - hero.offsetHeight);
-    const progress = Math.min(1, Math.max(0, -bounds.top / distance));
-    const time = progress * Math.max(0, video.duration - 0.05);
-    if (Math.abs(video.currentTime - time) >= 0.035) video.currentTime = time;
+    const progress = Math.min(1, Math.max(0, -track.getBoundingClientRect().top / distance));
+    target = Math.round(progress * last);
+    let closest = shown;
+    for (const index of loaded.keys()) {
+      if (Math.abs(index - target) < Math.abs(closest - target)) closest = index;
+    }
+    if (closest !== shown) {
+      portrait.src = loaded.get(closest);
+      shown = closest;
+    }
+    fillQueue();
   }
 
   function queueFrame() {
-    if (!frame) frame = requestAnimationFrame(syncFrame);
+    if (!tick) tick = requestAnimationFrame(syncFrame);
   }
 
-  addEventListener('scroll', queueFrame, { passive: true });
-  addEventListener('resize', queueFrame);
-  video.addEventListener('loadedmetadata', () => {
+  function enable() {
     track.classList.add('motion-ready');
     queueFrame();
-  });
-  if (video.readyState >= 1) track.classList.add('motion-ready');
-  video.addEventListener('error', () => track.classList.remove('motion-ready'));
-  video.addEventListener('canplaythrough', queueFrame);
+  }
+
+  portrait.decode().then(enable).catch(() => {});
+  addEventListener('scroll', queueFrame, { passive: true });
+  addEventListener('resize', queueFrame);
   cover.addEventListener('close', queueFrame);
   reducedMotion.addEventListener('change', queueFrame);
   document.querySelector('.motion').addEventListener('click', queueFrame);
-  queueFrame();
 })();

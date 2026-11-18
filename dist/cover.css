@@ -72,3 +72,23 @@ html:has(.book-intro[open]) .hero-portrait { animation-play-state: paused; }
   .hero-scroll.motion-ready::after { display: none; }
   .hero-scroll.motion-ready .hero { position: relative; }
 }
+.hero-portrait {
+  display: grid;
+  place-items: center;
+  container-type: size;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+.hero-portrait #couple-motion {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100cqh;
+  border: 0;
+  border-radius: 0;
+  mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent), linear-gradient(to bottom, transparent, #000 12%, #000 76%, transparent);
+  mask-composite: intersect;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent), linear-gradient(to bottom, transparent, #000 12%, #000 76%, transparent);
+  -webkit-mask-composite: source-in;
+}
