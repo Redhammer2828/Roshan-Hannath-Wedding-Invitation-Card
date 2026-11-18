@@ -4,6 +4,7 @@
   const track = hero.parentElement;
   const cover = document.querySelector('.book-intro');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const frameDirectory = portrait.getAttribute('src').replace(/[^/]+$/, '');
   const last = Number(portrait.dataset.frames) - 1;
   const loaded = new Map([[0, portrait.getAttribute('src')]]);
   const requested = new Set();
@@ -11,13 +12,15 @@
   let tick = 0;
   let shown = 0;
   let target = 0;
+  let position = 0;
+  let previousTime = 0;
 
   function load(index) {
     if (loaded.has(index) || requested.has(index)) return;
     const frame = new Image();
     requested.add(index);
     active++;
-    frame.src = 'portrait-frames/' + String(index).padStart(3, '0') + '.webp';
+    frame.src = frameDirectory + String(index).padStart(3, '0') + '.webp';
     frame.decode().then(() => {
       loaded.set(index, frame.src);
       queueFrame();
@@ -39,15 +42,28 @@
     }
   }
 
-  function syncFrame() {
+  function syncFrame(now) {
     tick = 0;
-    if (cover.open || reducedMotion.matches || document.documentElement.classList.contains('still')) return;
+    if (cover.open || reducedMotion.matches || document.documentElement.classList.contains('still')) {
+      previousTime = 0;
+      return;
+    }
     const distance = Math.max(1, track.offsetHeight - hero.offsetHeight);
     const progress = Math.min(1, Math.max(0, -track.getBoundingClientRect().top / distance));
     target = Math.round(progress * last);
+    const elapsed = previousTime ? Math.min(now - previousTime, 32) : 16;
+    previousTime = now;
+    const difference = target - position;
+    if (progress === 0 || progress === 1 || Math.abs(difference) < 0.5) {
+      position = target;
+    } else {
+      position += difference * (1 - Math.exp(-elapsed / 48));
+      queueFrame();
+    }
+    const desired = Math.round(position);
     let closest = shown;
     for (const index of loaded.keys()) {
-      if (Math.abs(index - target) < Math.abs(closest - target)) closest = index;
+      if (Math.abs(index - desired) < Math.abs(closest - desired)) closest = index;
     }
     if (closest !== shown) {
       portrait.src = loaded.get(closest);
@@ -62,6 +78,7 @@
 
   function enable() {
     track.classList.add('motion-ready');
+    if (!reducedMotion.matches) fillQueue();
     queueFrame();
   }
 
